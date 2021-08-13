@@ -112,7 +112,7 @@ function getRandomFocus(eventType){
   let keys = Object.keys(randomevent_focus[eventType]);
   let focus = '';
   keys.forEach((key, index) => {
-    if(key < result){
+    if(key <= result){
       focus = randomevent_focus[eventType][key];
     }
   });
