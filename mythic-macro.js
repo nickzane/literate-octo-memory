@@ -5,8 +5,7 @@ let npc_motivation_verbs = ["advise","obtain","attempt","spoil","oppress","inter
 let npc_motivation_nouns = ["wealth","hardship","affluence","resources","prosperity","poverty","opulence","deprivation","success","distress","contraband","music","literature","technology","alcohol","medicines","beauty","strength","intelligence","force","the wealthy","the populous","enemies","the public","religion","the poor","family","the elite","academia","the forsaken","the law","the government","the downtrodden","friends","criminals","allies","secret societies","the world","military","the church","dreams","discretion","love","freedom","pain","faith","slavery","enlightenment","racism","sensuality","dissonance","peace","discrimination","disbelief","pleasure","hate","happiness","servitude","harmony","justice","gluttony","lust","envy","greed","laziness","wrath","pride","purity","moderation","vigilance","zeal","composure","charity","modesty","atrocities","cowardice","narcissism","compassion","valour","patience","advice","propaganda","science","knowledge","communications","lies","myths","riddles","stories","legends","industry","new religions","progress","animals","ghosts","magic","nature","old religions","expertise","spirits"];
 let randomevent_meaning_action = ["Attainment","Starting","Neglect","Fight","Recruit","Triumph","Violate","Oppose","Malice","Communicate","Persecute","Increase","Decrease","Abandon","Gratify","Inquire","Antagonise","Move","Waste","Truce","Release","Befriend","Judge","Desert","Dominate","Procrastinate","Praise","Separate","Take","Break","Heal","Delay","Stop","Lie","Return","Imitate","Struggle","Inform","Bestow","Postpone","Expose","Haggle","Imprison","Release","Celebrate","Develop","Travel","Block","Harm","Debase","Overindulge","Adjourn","Adversity","Kill","Disrupt","Usurp","Create","Betray","Agree","Abuse","Oppress","Inspect","Ambush","Spy","Attach","Carry","Open","Carelessness","Ruin","Extravagance","Trick","Arrive","Propose","Divide","Refuse","Mistrust","Deceive","Cruelty","Intolerance","Trust","Excitement","Activity","Assist","Care","Negligence","Passion","Work hard","Control","Attract","Failure","Pursue","Vengeance","Proceedings","Dispute","Punish","Guide","Transform","Overthrow","Oppress","Change"];
 let randomevent_meaning_subject = ["Goals","Dreams","Environment","Outside","Inside","Reality","Allies","Enemies","Evil","Good","Emotions","Opposition","War","Peace","The innocent","Love","The spiritual","The intellectual","New ideas","Joy","Messages","Energy","Balance","Tension","Friendship","The physical","A project","Pleasures","Pain","Possessions","Benefits","Plans","Lies","Expectations","Legal matters","Bureaucracy","Business","A path","News","Exterior factors","Advice","A plot","Competition","Prison","Illness","Food","Attention","Success","Failure","Travel","Jealousy","Dispute","Home","Investment","Suffering","Wishes","Tactics","Stalemate","Randomness","Misfortune","Death","Disruption","Power","A burden","Intrigues","Fears","Ambush","Rumour","Wounds","Extravagance","A representative","Adversities","Opulence","Liberty","Military","The mundane","Trials","Masses","Vehicle","Art","Victory","Dispute","Riches","Status quo","Technology","Hope","Magic","Illusions","Portals","Danger","Weapons","Animals","Weather","Elements","Nature","The public","Leadership","Fame","Anger","Information"];
-//functions, get the ball rolling
-function roll(){
+function roll(){//functions, get the ball rolling
   let r = new Roll('1d100');
   r.evaluate();
   return r.result;
@@ -40,11 +39,10 @@ function mythic(html,private){
     if (focus === "Introduce a new NPC"){
       scene += "<br>NPC: " + npc_adjectives[roll()] + ', ' + npc_nouns[roll()] + ', ' + npc_motivation_verbs[roll()] + ', ' +  npc_motivation_nouns[roll()];
     }
-  }
-  //hacky chunky method for making one message private and the other public
+  }//hacky solution to privatize message, could be better
   let privacy = {flavor : 'Answers<br>' + answer,
     whisper: game.users.entities.filter(u => u.isGM).map(u => u._id),
-    speaker: {actor: "Qff8uFiRH77UZmZ0"},
+    speaker: {actor: "Qff8uFiRH77UZmZ0"},//to get the actor ID open your developer tools, go to the console, and type game.actors to get an array of all the actors in your actor folders or use the find function and search for the name to get the object with the id
     content: scene};
   let message = {flavor : 'Answers<br>' + answer,
     speaker: {actor: "Qff8uFiRH77UZmZ0"},
@@ -55,12 +53,11 @@ function mythic(html,private){
     ChatMessage.create(message);
   }
 }
-//this one can be run independently to just get an event
-function generateEvent(html, private){
+function generateEvent(html, private){//this one can be run independently to just get an event
   let result = roll1d10();
   let eventType = document.getElementById("event").value;
   let chaoslevel = document.getElementById("rank").value;
-  if(!chaoslevel){chaoslevel = 5};
+  if(!chaoslevel){chaoslevel = 5}else if(chaoslevel>10){chaoslevel = 10};
   let alter = false;
   let parity;
   let alteration;
@@ -81,12 +78,10 @@ function generateEvent(html, private){
     scene += "<br>NPC: " + npc_adjectives[roll()] + ', ' + npc_nouns[roll()] + ', ' + npc_motivation_verbs[roll()] + ', ' +  npc_motivation_nouns[roll()];
   }
   let content = focus + ' <br> ' + meaning + ' ' + alteration + ' ' + scene;
-  //to get the actor ID open your developer tools, go to the console, and type game.actors to get an array of all the actors in your actor folders
   let privacy = {flavor : 'Scene Made <br>['+result+']',
     whisper: game.users.entities.filter(u => u.isGM).map(u => u._id),
     speaker: {actor: "Qff8uFiRH77UZmZ0"},
     content: content};
-  //I chose a speaker other than myself for the character portrait using that module https://foundryvtt.com/packages/chat-portrait/
   let message = {flavor : 'Scene Made <br>['+result+']',
     speaker: {actor: "Qff8uFiRH77UZmZ0"},
     content: content};
@@ -96,8 +91,7 @@ function generateEvent(html, private){
     ChatMessage.create(message);
   }
 }
-//use those meaning tables
-function getRandomMeaning(){
+function getRandomMeaning(){//use those meaning tables at the start
   let meaning_roll_action = roll()-1;
   let meaning_roll_subject = roll()-1;
   let meaning_action = randomevent_meaning_action[meaning_roll_action];
@@ -111,15 +105,14 @@ function getRandomFocus(eventType){
   var randomevent_focus={Standard:{1:"Remote event",8:"NPC Action",29:"Introduce a new NPC",36:"Move toward a thread",46:"Move away from a thread",53:"Close a thread",56:"PC negative",68:"PC positive",76:"Ambiguous event",84:"NPC negative",93:"NPC positive"},Horror:{1:"Horror - PC",11:"Horror - NPC",24:"Remote event",31:"NPC Action",50:"Introduce a new NPC",53:"Move toward a thread",56:"Move away from a thread",63:"PC negative",73:"PC positive",76:"Ambiguous event",83:"NPC negative",98:"NPC positive"},Adventure:{1:"Action!",17:"Remote event",25:"NPC Action",45:"Introduce a new NPC",53:"Move toward a thread",57:"Move away from a thread",65:"PC negative",77:"PC positive",81:"Ambiguous event",85:"NPC negative",97:"NPC positive"},Mystery:{1:"Remote event",9:"NPC Action",21:"Introduce a new NPC",33:"Move toward a thread",53:"Move away from a thread",65:"PC negative",73:"PC positive",81:"Ambiguous event",89:"NPC negative",97:"NPC positive"},Social:{1:"Drop a bomb!",13:"Remote event",25:"NPC Action",37:"Introduce a new NPC",45:"Move toward a thread",57:"Move away from a thread",61:"Close a thread",65:"PC negative",73:"PC positive",81:"Ambiguous event",93:"NPC negative",97:"NPC positive"},Personal:{1:"Remote event",8:"NPC Action",25:"PC NPC acion",29:"Introduce a new NPC",36:"Move toward a thread",43:"Move toward a PC thread",46:"Move away from a thread",51:"Move away from a PC thread",53:"Close a thread",55:"Close a PC thread",56:"PC negative",68:"PC positive",76:"Ambiguous event",84:"NPC negative",91:"PC NPC negative",93:"NPC positive",100:"PC NPC positive"},Epic:{1:"Thread escalates",13:"Remote event",17:"NPC Action",31:"Introduce a new NPC",43:"Move toward a thread",47:"Move away from a thread",59:"PC negative",73:"PC positive",81:"Ambiguous event",85:"NPC negative",93:"NPC positive"}};
   let keys = Object.keys(randomevent_focus[eventType]);
   let focus = '';
-  keys.forEach((key, index) => {
+  keys.forEach((key, index) => {//clever way to determine the range of the dice roll by overwriting (hacky but I like it)
     if(key <= result){
       focus = randomevent_focus[eventType][key];
     }
   });
   return focus;
 }
-//this determines one of the numbers for the fate table array, rank + odds. Typed them to numbers with +. Kept it between 1 and 9 for the array sizes.
-function getDiffValue(html){
+function getDiffValue(html){//this determines one of the numbers for the fate table array, rank + odds. Typed them to numbers with +. Kept it between 1 and 9 for the array sizes.
   let rank = document.getElementById("rank").value;
   let odds = document.getElementById("odds").value;
   if(!rank){rank = 5};
@@ -132,8 +125,7 @@ function getDiffValue(html){
   };
   return diff;
 }
-//the real meat of the functions is here, the fate table.
-function ask(html, result) {
+function ask(html, result) {//the real meat of the functions is here, the fate table.
   let fatetable = [
     [[10,50,91],[15,75,96],[16,85,97],[18,90,99],[19,95,100],[19,95,100],[20,100,0],[21,105,0],[23,115,0],[25,125,0],[26,145,0]],
     [[5,25,86],[10,50,91],[13,65,94],[15,75,96],[16,85,97],[18,90,99],[19,95,100],[19,95,100],[20,100,0],[22,110,0],[26,130,0]],
@@ -157,8 +149,7 @@ function ask(html, result) {
   } else {
     return "Very No [" + result + "]";
   };
-}
-//the form
+}// the form
 let myContent = `<form>
                 <script>
                   function addToEvent(txt){
@@ -223,8 +214,7 @@ let myContent = `<form>
                   <hr>
                 </div>
             </form>`;
-//the dialog stuff, four buttons, unnecessary but easy for proof of concept
-new Dialog({
+new Dialog({//the dialog stuff, four buttons, unnecessary but easy for proof of concept
     title: "Mythic Game Master",
     content: myContent,
     buttons: {
@@ -255,4 +245,4 @@ new Dialog({
     },
     default: "private"
 }).render(true);
-//play();
+//play(); too lazy to find a sound yet
