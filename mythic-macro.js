@@ -37,7 +37,7 @@ function mythic(html,private){
     let focus = getRandomFocus(eventType);
     scene += "<h2>An Event Occurs</h2> Focus: '" + focus + "' Meaning: " + getRandomMeaning();
     if (focus === "Introduce a new NPC"){
-      scene += "<br>NPC: " + npc_adjectives[roll()] + ', ' + npc_nouns[roll()] + ', ' + npc_motivation_verbs[roll()] + ', ' +  npc_motivation_nouns[roll()];
+      scene += "<br>NPC: " + npc_adjectives[roll()-1] + ', ' + npc_nouns[roll()-1] + ', ' + npc_motivation_verbs[roll()-1] + ', ' +  npc_motivation_nouns[roll()-1];
     }
   }//hacky solution to privatize message, could be better
   let privacy = {flavor : 'Answers<br>' + answer,
@@ -75,7 +75,7 @@ function generateEvent(html, private){//this one can be run independently to jus
   let meaning = getRandomMeaning();
   let focus = getRandomFocus(eventType);
   if (focus === "Introduce a new NPC"){
-    scene += "<br>NPC: " + npc_adjectives[roll()] + ', ' + npc_nouns[roll()] + ', ' + npc_motivation_verbs[roll()] + ', ' +  npc_motivation_nouns[roll()];
+    scene += "<br>NPC: " + npc_adjectives[roll()-1] + ', ' + npc_nouns[roll()-1] + ', ' + npc_motivation_verbs[roll()-1] + ', ' +  npc_motivation_nouns[roll()-1];
   }
   let content = focus + ' <br> ' + meaning + ' ' + alteration + ' ' + scene;
   let privacy = {flavor : 'Scene Made <br>['+result+']',
