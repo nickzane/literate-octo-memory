@@ -15,15 +15,15 @@ function roll1d10(){
   r.evaluate();
   return r.result;
 }
-//sounds play even when the message is private
-function play(){
+function play(){//sounds play even when the message is private
   AudioHelper.play({src: "sounds/coin_toss.mp3", volume: 0.8, autoplay: true, loop: false}, true);
 }
-//the main function that drives the result
-function mythic(html,private){
+function mythic(html,private){//the main function that drives the result
   let scene = '';
   let result = roll();
   let isEvent = false;
+  let odds = document.getElementById("odds").value;
+  if(!odds){odds = 0};
   let chaoslevel = document.getElementById("rank").value;
   if(!chaoslevel){chaoslevel = 5};
   if (result % 11 == 0) {
@@ -35,19 +35,19 @@ function mythic(html,private){
   let eventType = document.getElementById("event").value;
   if(isEvent){
     let focus = getRandomFocus(eventType);
-    scene += "<h2>An Event Occurs</h2> Focus: '" + focus + "' Meaning: " + getRandomMeaning();
+    scene += `<h2>An Event Occurs</h2> Focus: ${focus} Meaning: ` + getRandomMeaning();
     if (focus === "Introduce a new NPC"){
       scene += "<br>NPC: " + npc_adjectives[roll()-1] + ', ' + npc_nouns[roll()-1] + ', ' + npc_motivation_verbs[roll()-1] + ', ' +  npc_motivation_nouns[roll()-1];
     }
-  }//hacky solution to privatize message, could be better
-  let privacy = {flavor : 'Answers<br>' + answer,
+  }
+  let privacy = {flavor : `${answer} <br />r/o: ${chaoslevel}/${odds}`,
     whisper: game.users.entities.filter(u => u.isGM).map(u => u._id),
-    speaker: {actor: "Qff8uFiRH77UZmZ0"},//to get the actor ID open your developer tools, go to the console, and type game.actors to get an array of all the actors in your actor folders or use the find function and search for the name to get the object with the id
-    content: scene};
-  let message = {flavor : 'Answers<br>' + answer,
     speaker: {actor: "Qff8uFiRH77UZmZ0"},
     content: scene};
-  if(private){
+  let message = {flavor : `${answer} <br />r/o: ${chaoslevel}/${odds}`,
+    speaker: {actor: "Qff8uFiRH77UZmZ0"},
+    content: scene};
+  if(private){//hacky solution to privatize message, could be better
     ChatMessage.create(privacy);
   }else{
     ChatMessage.create(message);
@@ -56,33 +56,34 @@ function mythic(html,private){
 function generateEvent(html, private){//this one can be run independently to just get an event
   let result = roll1d10();
   let eventType = document.getElementById("event").value;
+  let odds = document.getElementById("odds").value;
+  if(!odds){odds = 0};
   let chaoslevel = document.getElementById("rank").value;
   if(!chaoslevel){chaoslevel = 5}else if(chaoslevel>10){chaoslevel = 10};
   let alter = false;
   let parity;
   let alteration;
+  if(!alteration){alteration = '';}
   let scene = '';
-  if(result <= chaoslevel){
+  if(chaoslevel >= result){
     alter = true;
-    parity = (result % 2  == 0) ? "even" : "odd";
-    if(parity = 'even'){
+    if(result % 2  == 0){
       alteration = '[Interrupt]';
-    }else if (parity = 'odd'){
+    }else{
       alteration = '[Alteration]';
     }
   }
-  if(!alteration){alteration = '';}
   let meaning = getRandomMeaning();
   let focus = getRandomFocus(eventType);
   if (focus === "Introduce a new NPC"){
     scene += "<br>NPC: " + npc_adjectives[roll()-1] + ', ' + npc_nouns[roll()-1] + ', ' + npc_motivation_verbs[roll()-1] + ', ' +  npc_motivation_nouns[roll()-1];
   }
-  let content = focus + ' <br> ' + meaning + ' ' + alteration + ' ' + scene;
-  let privacy = {flavor : 'Scene Made <br>['+result+']',
+  let content = `<h2>Scene Made</h2>${focus}<br>${meaning} ${alteration} ${scene}`;
+  let privacy = {flavor : `[${result}] <br />r/o: ${chaoslevel}/${odds}`,
     whisper: game.users.entities.filter(u => u.isGM).map(u => u._id),
     speaker: {actor: "Qff8uFiRH77UZmZ0"},
     content: content};
-  let message = {flavor : 'Scene Made <br>['+result+']',
+  let message = {flavor : `[${result}] <br />r/o: ${chaoslevel}/${odds}`,
     speaker: {actor: "Qff8uFiRH77UZmZ0"},
     content: content};
   if(private){
@@ -91,7 +92,7 @@ function generateEvent(html, private){//this one can be run independently to jus
     ChatMessage.create(message);
   }
 }
-function getRandomMeaning(){//use those meaning tables at the start
+function getRandomMeaning(){
   let meaning_roll_action = roll()-1;
   let meaning_roll_subject = roll()-1;
   let meaning_action = randomevent_meaning_action[meaning_roll_action];
@@ -105,14 +106,14 @@ function getRandomFocus(eventType){
   var randomevent_focus={Standard:{1:"Remote event",8:"NPC Action",29:"Introduce a new NPC",36:"Move toward a thread",46:"Move away from a thread",53:"Close a thread",56:"PC negative",68:"PC positive",76:"Ambiguous event",84:"NPC negative",93:"NPC positive"},Horror:{1:"Horror - PC",11:"Horror - NPC",24:"Remote event",31:"NPC Action",50:"Introduce a new NPC",53:"Move toward a thread",56:"Move away from a thread",63:"PC negative",73:"PC positive",76:"Ambiguous event",83:"NPC negative",98:"NPC positive"},Adventure:{1:"Action!",17:"Remote event",25:"NPC Action",45:"Introduce a new NPC",53:"Move toward a thread",57:"Move away from a thread",65:"PC negative",77:"PC positive",81:"Ambiguous event",85:"NPC negative",97:"NPC positive"},Mystery:{1:"Remote event",9:"NPC Action",21:"Introduce a new NPC",33:"Move toward a thread",53:"Move away from a thread",65:"PC negative",73:"PC positive",81:"Ambiguous event",89:"NPC negative",97:"NPC positive"},Social:{1:"Drop a bomb!",13:"Remote event",25:"NPC Action",37:"Introduce a new NPC",45:"Move toward a thread",57:"Move away from a thread",61:"Close a thread",65:"PC negative",73:"PC positive",81:"Ambiguous event",93:"NPC negative",97:"NPC positive"},Personal:{1:"Remote event",8:"NPC Action",25:"PC NPC acion",29:"Introduce a new NPC",36:"Move toward a thread",43:"Move toward a PC thread",46:"Move away from a thread",51:"Move away from a PC thread",53:"Close a thread",55:"Close a PC thread",56:"PC negative",68:"PC positive",76:"Ambiguous event",84:"NPC negative",91:"PC NPC negative",93:"NPC positive",100:"PC NPC positive"},Epic:{1:"Thread escalates",13:"Remote event",17:"NPC Action",31:"Introduce a new NPC",43:"Move toward a thread",47:"Move away from a thread",59:"PC negative",73:"PC positive",81:"Ambiguous event",85:"NPC negative",93:"NPC positive"}};
   let keys = Object.keys(randomevent_focus[eventType]);
   let focus = '';
-  keys.forEach((key, index) => {//clever way to determine the range of the dice roll by overwriting (hacky but I like it)
+  keys.forEach((key, index) => {{//clever way to determine the range of the dice roll by overwriting (hacky but I like it)
     if(key <= result){
       focus = randomevent_focus[eventType][key];
     }
   });
   return focus;
 }
-function getDiffValue(html){//this determines one of the numbers for the fate table array, rank + odds. Typed them to numbers with +. Kept it between 1 and 9 for the array sizes.
+function getDiffValue(html){
   let rank = document.getElementById("rank").value;
   let odds = document.getElementById("odds").value;
   if(!rank){rank = 5};
@@ -125,7 +126,7 @@ function getDiffValue(html){//this determines one of the numbers for the fate ta
   };
   return diff;
 }
-function ask(html, result) {//the real meat of the functions is here, the fate table.
+function ask(html, result) {//this is the meat of the macro
   let fatetable = [
     [[10,50,91],[15,75,96],[16,85,97],[18,90,99],[19,95,100],[19,95,100],[20,100,0],[21,105,0],[23,115,0],[25,125,0],[26,145,0]],
     [[5,25,86],[10,50,91],[13,65,94],[15,75,96],[16,85,97],[18,90,99],[19,95,100],[19,95,100],[20,100,0],[22,110,0],[26,130,0]],
@@ -149,7 +150,7 @@ function ask(html, result) {//the real meat of the functions is here, the fate t
   } else {
     return "Very No [" + result + "]";
   };
-}// the form
+}
 let myContent = `<form>
                 <script>
                   function addToEvent(txt){
@@ -169,7 +170,7 @@ let myContent = `<form>
                 <h2>Mythic Game Master</h2>
                 </div>
                 <div class="form-group">
-                  <button type="button" onclick="addToEvent('0')">Standard</button><button type="button" onclick="addToEvent('horror')">Horror</button><button type="button" onclick="addToEvent('adventure')">Adventure</button><button type="button" onclick="addToEvent('mystery')">Mystery</button><button type="button" onclick="addToEvent('social')">Social</button><button type="button" onclick="addToEvent('personal')">Personal</button><button type="button" onclick="addToEvent('epic')">Epic</button>
+                  <button type="button" onclick="addToEvent('standard')">Standard</button><button type="button" onclick="addToEvent('horror')">Horror</button><button type="button" onclick="addToEvent('adventure')">Adventure</button><button type="button" onclick="addToEvent('mystery')">Mystery</button><button type="button" onclick="addToEvent('social')">Social</button><button type="button" onclick="addToEvent('personal')">Personal</button><button type="button" onclick="addToEvent('epic')">Epic</button>
                 </div>
                 <div class="form-group">
                     <label>
@@ -214,7 +215,7 @@ let myContent = `<form>
                   <hr>
                 </div>
             </form>`;
-new Dialog({//the dialog stuff, four buttons, unnecessary but easy for proof of concept
+new Dialog({//unnecessary? buttons for private and public
     title: "Mythic Game Master",
     content: myContent,
     buttons: {
@@ -245,4 +246,4 @@ new Dialog({//the dialog stuff, four buttons, unnecessary but easy for proof of 
     },
     default: "private"
 }).render(true);
-//play(); too lazy to find a sound yet
+//play();
